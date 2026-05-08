@@ -29,11 +29,15 @@ func _exit_tree() -> void:
 	replug.queue_free()
 
 func _on_replug_pressed():
+	var empty : bool = true
 	for idx in range(menu.item_count):
 		var plugin = menu.get_item_text(idx)
 		if menu.is_item_checked(idx):
+			empty = true
 			EditorInterface.set_plugin_enabled(plugin, false)
 			EditorInterface.set_plugin_enabled.call_deferred(plugin, true)
+	if empty:
+		printerr("Re-Plug: No plugins reloaded. Check if any are enabled and selected!")
 	update_target_list.call_deferred()
 
 func _on_target_pressed(idx:int):
