@@ -15,25 +15,27 @@ func _enter_tree() -> void:
 	menu = PopupMenu.new()
 	menu.hide_on_checkable_item_selection = false
 	menu.index_pressed.connect(_on_target_pressed)
-	for plugin in DirAccess.get_directories_at("addons"):
-		if plugin == "plugin_reload":
-			continue
-		all_plugins.append(plugin)
-	add_tool_submenu_item("Re-Plug", menu)
-	update_target_list()
-
+	setup.call_deferred()
 
 func _exit_tree() -> void:
 	remove_control_from_container(CONTAINER_TOOLBAR, replug)
 	remove_tool_menu_item("Re-Plug")
 	replug.queue_free()
 
+func setup():
+	for plugin in DirAccess.get_directories_at("addons"):
+		if plugin == "plugin_reload":
+			continue
+		all_plugins.append(plugin)
+	add_tool_submenu_item("Re-Plug", menu)
+	update_target_list.call_deferred()
+
 func _on_replug_pressed():
 	var empty : bool = true
 	for idx in range(menu.item_count):
 		var plugin = menu.get_item_text(idx)
 		if menu.is_item_checked(idx):
-			empty = true
+			empty = false
 			EditorInterface.set_plugin_enabled(plugin, false)
 			EditorInterface.set_plugin_enabled.call_deferred(plugin, true)
 	if empty:
